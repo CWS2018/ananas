@@ -11,6 +11,10 @@ public:
    // LogBuffer(const LogBuffer &buf);
     ~LogBuffer() {}
 
+    void bzero() {
+        memcpy(_data, 0, sizeof(_data));
+    }
+
     void add(int len) {
         _cur += len;
     }
