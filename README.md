@@ -7,7 +7,7 @@ A simple async log
 
 ************      
 
-异步日志分为前端和后端两部分：
+异步日志分为前端和后端两部分：          
     * 前端：由多个线程共享，通过接口`AsyncLog::append()`将各自的一条日志输出到缓存区里，利用`AsyncLog::_mutex`保证多线程的同步。前端不执行IO，它会在缓存区`AsyncLog::_curBuffer`写不下时，将这一大块日志传输到后端，并通过条件变量`AsyncLog::_cond`唤醒后端线程来将日志`flush`到磁盘。             
     * 后端：仅有一个线程占有，该线程在构建对象`AsyncLog`时通过单例`pthread_once()`创建并初始化一次，后端线程会等待前端的唤醒、或者在等待一定的时间后，会执行IO操作，将日志写到磁盘里。         
 
@@ -29,7 +29,7 @@ A simple async log
     * 后端有两个`newBuffer1`和`newBuffer2`，这两个`Buffer`是前端`_curBuffer`、`_nextBuffer`的备胎。      
 
 
-感悟心得：
+感悟心得：         
     * 学会了如何重复回收利用内存，对移动语意有了进一步的认识，`std::move()`的使用，避免了缓冲区的不断构造、销毁，重复利用了内存空间，配合智能指针的`std::shared_ptr`、`std::unique_ptr`的使用，进一步避免内存泄露，简直perfect。           
     * 编程技巧，陈硕老师的muduo中的`convert(T v)`(见`logstream.cc`)的巧妙，一个将数值转换成字符串的函数，大佬就是大佬，一个简单的函数都甩我几条街。             
     * RTTI的使用，刚开始没有看到`Log::~Log()`时，想不明白`LOG << "nwuking"`怎么就将日志写到文件里了。使用RTTI技巧，再配合一个`{}`作用域，后顾无忧～～～
