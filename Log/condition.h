@@ -26,6 +26,8 @@ public:
         pthread_mutex_t m = _mutex.mutex();
         pthread_cond_wait(&_cond, &m);
     }
+
+    void waitForSeconds(int seconds);
 private:
     pthread_cond_t _cond;
     Mutex &_mutex;
