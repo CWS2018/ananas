@@ -15,6 +15,7 @@ AsyncLog::AsyncLog(const std::string logfilename, int seconds)
       _buffers(),
       _mutex(),
       _cond(_mutex),
+      _count(1),
       _thread(std::bind(&AsyncLog::back_end_threadFunc, this), "Log")
 {
     _curBuffer->bzero();
@@ -59,9 +60,9 @@ void AsyncLog::back_end_threadFunc() {
     /*
      * 后端接口， 将日志写入文件
      */
-
+    
     assert(_working == true);
-
+    _count.countDown();
     // 初始化，两块new buffer是为前端的two buffer准备
     // 尽最大努力确保前端的的日志有足够的buffer写入
     BufferPtr newBuffer1(new Buffer);
@@ -84,7 +85,6 @@ void AsyncLog::back_end_threadFunc() {
         assert(newBuffer1 && newBuffer1->length() == 0);
         assert(newBuffer2 && newBuffer2->length() == 0);
         assert(buffersToWrite.empty());        
-
         {
             // 临界区
 
@@ -103,6 +103,7 @@ void AsyncLog::back_end_threadFunc() {
                 // _nextBuffer 已经给_curBuffer使用
                 // 为_nextBuffer准备buffer
                 _nextBuffer = std::move(newBuffer2);
+               
             }
         }
 

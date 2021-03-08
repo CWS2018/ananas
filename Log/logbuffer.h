@@ -2,6 +2,7 @@
 #define LOGBUFFER_H_
 
 #include <string.h>
+#include <iostream>
 
 template<int SIZE>
 class LogBuffer
@@ -12,7 +13,7 @@ public:
     ~LogBuffer() {}
 
     void bzero() {
-        memcpy(_data, 0, sizeof(_data));
+        memset(_data, 0, sizeof(_data));
     }
 
     void add(int len) {

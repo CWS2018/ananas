@@ -5,6 +5,9 @@
 
 #include <string>
 
+#include <stdio.h>
+#include <stdlib.h>
+
 class Log
 {
 public:
@@ -28,6 +31,9 @@ private:
     };
 
     Impl _impl;
+
+public:
+    static std::string _logfilename;
 };
 
 #define LOG_INFO Log(__FILE__, __LINE__).stream()

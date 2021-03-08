@@ -6,7 +6,7 @@
 #include <string>
 
 const int ksmallbuffer = 4000;
-const int klargebuffer = 4000 * 1000;
+//const int klargebuffer = 4000 * 1000;
 
 class LogStream
 {

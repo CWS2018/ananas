@@ -8,15 +8,25 @@
 #include <string.h>
 #include <pthread.h>
 
+#include <memory>
+#include <iostream>
+
 static pthread_once_t g_pthread_once = PTHREAD_ONCE_INIT; 
 
+//const std::string g_logfile= "./asynclogfile.log";
+std::string Log::_logfilename = "./asynclogfile.log";
+
 // 全局唯一一个 AsyncLog对象，多个线程共享
-static AsyncLog g_asynclog;
+//static AsyncLog *g_asynclog;
+static std::unique_ptr<AsyncLog> g_asynclog;
 
 void asynclog_init() {
-    // 初始化后端线程
-    g_asynclog.start();
+    // 构建AsyncLog对象并初始化后端线程
+    g_asynclog.reset(new AsyncLog(Log::_logfilename));
+    //g_asynclog = new AsyncLog(Log::_logfilename);
+    g_asynclog->start();
 }
+
 
 void g_output(const char *data, int len) {
     /*
@@ -26,10 +36,10 @@ void g_output(const char *data, int len) {
 
     // 调用一次
     pthread_once(&g_pthread_once, asynclog_init);
-
-    // 输出到后端
-    g_asynclog.append(data, len);
+    g_asynclog->append(data, len);
 }
+
+
 
 void Log::Impl::formatInput() {
     /* 首先格式化输出一条日志中的日期、时间、线程号
@@ -79,10 +89,10 @@ Log::~Log() {
      * 调用callbackFunc将整条日志传输到后端
      */
 
-    _impl._logstream << "——" << _impl._basename << ":" << _impl._line << "\n";
+    _impl._logstream << "--" << _impl._basename << ":" << _impl._line << "\n";
 
     const LogStream::Buffer& buf(stream().buffer());
 
     // 调用 g_output 将一条日志输出到后端
-    g_output(buf.data(), buf.length());
+   g_output(buf.data(), buf.length());
 }

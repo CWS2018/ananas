@@ -4,6 +4,8 @@
 #include "./noncopy.h"
 #include "./mutex.h"
 
+#include <string.h>
+
 class Cond : noncopy
 {
 public:
@@ -23,11 +25,18 @@ public:
     }
 
     void wait() {
-        pthread_mutex_t m = _mutex.mutex();
-        pthread_cond_wait(&_cond, &m);
+        pthread_mutex_t *m = _mutex.mutex();
+        pthread_cond_wait(&_cond, m);
     }
 
-    void waitForSeconds(int seconds);
+    void waitForSeconds(int seconds) {
+        struct timespec abstime;
+        clock_gettime(CLOCK_REALTIME, &abstime);
+        abstime.tv_sec += static_cast<time_t>(seconds);
+
+        pthread_mutex_t *m = _mutex.mutex();
+        pthread_cond_timedwait(&_cond, m, &abstime);
+    }
 private:
     pthread_cond_t _cond;
     Mutex &_mutex;

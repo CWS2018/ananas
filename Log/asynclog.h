@@ -6,13 +6,14 @@
 #include "./mutex.h"
 #include "./condition.h"
 #include "./thread.h"
+#include "./countDownLatch.h"
 
 #include <string>
 #include <atomic>
 #include <vector>
 #include <memory>
 
-const int klargebuffer = 4000 * 1000;
+const int klargebuffer = 4000 * 100;
 
 class AsyncLog : noncopy
 {
@@ -21,17 +22,19 @@ public:
     typedef std::unique_ptr<Buffer> BufferPtr;
     typedef std::vector<std::unique_ptr<Buffer>> BufferVector;
 
-    AsyncLog();
-    AsyncLog(const std::string logfilename, int seconds);
+    //AsyncLog();
+    AsyncLog(const std::string logfilename, int seconds = 2);
     ~AsyncLog();
 
     void start() {
         _working = true;
         _thread.start();
+        _count.wait();
     }
 
     void stop() {
         _working = false;
+        _cond.notify();
         _thread.join();
     }
 
@@ -49,6 +52,7 @@ private:
 
     Mutex _mutex;
     Cond _cond;
+    countDownLatch _count;
     Thread _thread;
 };
 

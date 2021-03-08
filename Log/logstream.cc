@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <algorithm>
+#include <iostream>
 
 
 typedef LogStream::self self;

@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include <iostream>
+
 class Mutex : noncopy
 {
     /*
@@ -15,33 +17,29 @@ class Mutex : noncopy
      */
 public:
     Mutex() : _ower(0) {
-        pthread_mutexattr_init(&_mutexattr);
-        pthread_mutexattr_settype(&_mutexattr, PTHREAD_MUTEX_NORMAL);
-        pthread_mutex_init(&_mutex, &_mutexattr);
+        pthread_mutex_init(&_mutex, NULL);
     }
     ~Mutex() {
         pthread_mutex_destroy(&_mutex);
-        pthread_mutexattr_destroy(&_mutexattr);
     }
 
     void lock() {
         // 上锁
         pthread_mutex_lock(&_mutex);
-        _ower = threadId::tid();
+        //_ower = threadId::tid();
     }
     void unlock() {
         // 解锁
-        assert(_ower == threadId::tid());
+        //assert(_ower == threadId::tid());
         _ower = 0;
         pthread_mutex_unlock(&_mutex);
     }
 
-    pthread_mutex_t mutex() {
-        return _mutex;
+    pthread_mutex_t *mutex() {
+        return &_mutex;
     }
 private:
     pthread_mutex_t _mutex;
-    pthread_mutexattr_t _mutexattr;
     pid_t _ower;
 };
 

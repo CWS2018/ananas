@@ -4,8 +4,9 @@
 #include "./noncopy.h" 
 #include "./mutex.h"
 #include "./condition.h"
+#include "./countDownLatch.h"
 
-#include <thread.h>
+#include <pthread.h>
 
 #include <functional>
 #include <string>
@@ -27,8 +28,7 @@ private:
     pid_t _tid;
     pthread_t _ptid;
     ThreadFunc _threadFunc;
-    Mutex _mutex;
-    Cond _cond;
+    countDownLatch _count;
 };
 
 
