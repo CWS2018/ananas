@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <unistd.h>
+#include <vector>
 
 void test() {
     std::cout << "****************** test *********************" << std::endl;
@@ -21,8 +22,30 @@ void test() {
     LOG_INFO << std::string("China");
 }
 
+void test1() {
+    sleep(1);
+    for(int i = 0; i < 1000; ++i) {
+        LOG_INFO << i;
+    }
+}
+
+// 模拟多线程
+void multiThread_test() {
+    std::vector<std::shared_ptr<Thread>> ve;
+    for(int i = 0; i < 5; ++i) {
+        std::shared_ptr<Thread> th(new Thread(test1, "test"));
+        ve.push_back(th);
+    }
+    for(int i = 0; i < 5; ++i) {
+        ve[i]->start();
+    }
+    sleep(3);
+}
+
 int main()
 {
     test();
     sleep(3);
+
+    multiThread_test();
 }
